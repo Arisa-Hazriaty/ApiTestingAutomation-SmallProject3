@@ -1,0 +1,1369 @@
+{
+	"info": {
+		"_postman_id": "097ce324-e407-4399-a676-6b5ba172e263",
+		"name": "Orange-HRM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "001 Get Access Token",
+			"item": [
+				{
+					"name": "00.01 - Get Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify Access Token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token_type).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Verify scope\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.scope).to.eql(\"admin\");",
+									"});",
+									"",
+									"pm.test(\"Verify access_token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.access_token).to.be.a(\"string\");",
+									"    pm.environment.set(\"token\", jsonData.access_token);",
+									"});",
+									"",
+									"pm.test(\"verify expires_in\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.expires_in).to.be.a(\"number\");",
+									"    pm.expect(jsonData.expires_in).to.be.above(3000);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"client_id\", \"16041993\");",
+									"pm.environment.set(\"client_secret\", \"Arisah\");",
+									"pm.environment.set(\"grant_type\", \"client_credentials\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "{{grant_type}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/oauth/issueToken",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"oauth",
+								"issueToken"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "01.  Admin",
+			"item": [
+				{
+					"name": "1 Get Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify result\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].userName).to.eql(\"Admin\");",
+									"    pm.expect(jsonData.data[0].userRole).to.eql(\"Admin\");",
+									"    pm.expect(jsonData.data[0].status).to.eql(\"Enabled\");",
+									"    pm.expect(jsonData.data[0].employeeName).to.eql(\"admin admin\");",
+									"    pm.expect(jsonData.data[0].employeeId).to.eql(\"1\");",
+									"});",
+									"",
+									"pm.test(\"Verify total data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var datas = jsonData.data;",
+									"    pm.expect( datas.length).to.be.above(5);",
+									"   ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2 User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify login status\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.login).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Verify result\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.user.userName).to.eql(\"Arisah\");",
+									"    pm.expect(jsonData.user.userRole).to.eql(\"Admin\");",
+									"    pm.expect(jsonData.user.status).to.eql(\"Enabled\");",
+									"    pm.expect(jsonData.user.employeeName).to.eql(\"Arisa Hazriaty\");",
+									"    pm.expect(jsonData.user.employeeId).to.eql(\"6\");",
+									"    pm.environment.set(\"employeeid\", jsonData.user.employeeId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"username\", \"Arisah\");",
+									"pm.environment.set(\"password\", \"Coba@123\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "02.  Attendance",
+			"item": [
+				{
+					"name": "1. Punch In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify result\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Punched In\");",
+									"    pm.expect(jsonData.id).to.be.a(\"string\");",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"timezone\", \"Asia/Jakarta\");",
+									"pm.environment.set(\"note\", \"Testing\");",
+									"const moment = require('moment');",
+									"pm.environment.set(\"datetimePunchIn\", moment().format(\"YYYY-MM-DD hh:mm\"));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "{{employeeid}}",
+									"type": "text"
+								},
+								{
+									"key": "timezone",
+									"value": "{{timezone}}",
+									"type": "text"
+								},
+								{
+									"key": "note",
+									"value": "{{note}}",
+									"type": "text"
+								},
+								{
+									"key": "datetime",
+									"value": "{{datetimePunchIn}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:employeeid/punch-in",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":employeeid",
+								"punch-in"
+							],
+							"variable": [
+								{
+									"key": "employeeid",
+									"value": "{{employeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Punch Out",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Verify result\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Punched Out\");",
+									"    pm.expect(jsonData.id).to.be.a(\"string\");",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.get(\"timezone\");",
+									"pm.environment.get(\"note\");",
+									"pm.environment.get(\"datetimePunchIn\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "{{employeeid}}",
+									"type": "text"
+								},
+								{
+									"key": "timezone",
+									"value": "{{timezone}}",
+									"type": "text"
+								},
+								{
+									"key": "note",
+									"value": "{{note}}",
+									"type": "text"
+								},
+								{
+									"key": "datetime",
+									"value": "{{datetimePunchIn}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:employeeid/punch-out",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":employeeid",
+								"punch-out"
+							],
+							"variable": [
+								{
+									"key": "employeeid",
+									"value": "{{employeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03.  Employee",
+			"item": [
+				{
+					"name": "1. Save Employee",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"randomCodeEmployee\", pm.variables.replaceIn('{{$randomInt}}'));",
+									"pm.environment.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+									"pm.environment.set(\"middleName\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+									"pm.environment.set(\"lastName\", pm.variables.replaceIn('{{$randomLastName}}'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"    pm.environment.set(\"newemployeeid\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"Verify Response\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Saved\");",
+									"    pm.expect(jsonData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"firstName\": \"{{firstName}}\",\n\"middleName\":\"{{middleName}}\",\n\"lastName\":\"{{lastName}}\",\n\"code\":\"{{randomCodeEmployee}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{employeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Employee Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"    pm.environment.set(\"NewEmployeeid\", jsonData.code);",
+									"    ",
+									"});",
+									"",
+									"const firstName = pm.variables.get(\"firstName\");",
+									"const middleName = pm.variables.get(\"middleName\");",
+									"const lastName = pm.variables.get(\"lastName\");",
+									"",
+									"pm.test(\"Verify result\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.firstName).to.eql(pm.environment.get(\"firstName\"));",
+									"    pm.expect(jsonData.data.middleName).to.eql(pm.environment.get(\"middleName\"));",
+									"    pm.expect(jsonData.data.lastName).to.eql(pm.environment.get(\"lastName\"));",
+									"    pm.expect(jsonData.data.code).to.eql(pm.variables.get(\"randomCodeEmployee\").toString());",
+									"    pm.expect(jsonData.data.employeeId).to.eql(pm.environment.get(\"newemployeeid\"));",
+									"    pm.expect(jsonData.data.fullName).to.eql(firstName.concat(\" \", middleName, \" \", lastName));",
+									"    pm.environment.set(\"Name\",jsonData.data.fullName);",
+									"    pm.expect(jsonData.data.status).to.eql(null);",
+									"    pm.expect(jsonData.data.dob).to.eql(null);",
+									"    pm.expect(jsonData.data.driversLicenseNumber).to.eql(\"\");",
+									"    pm.expect(jsonData.data.licenseExpiryDate).to.eql(null);",
+									"    pm.expect(jsonData.data.maritalStatus).to.eql(null);",
+									"    pm.expect(jsonData.data.gender).to.eql(null);",
+									"    pm.expect(jsonData.data.otherId).to.eql(\"\");",
+									"    pm.expect(jsonData.data.nationality).to.eql(null);",
+									"    pm.expect(jsonData.data.unit).to.eql(null);",
+									"    pm.expect(jsonData.data.jobTitle).to.eql(null);",
+									"    pm.expect(jsonData.data.supervisor).to.eql(null);",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Update Employee Detail",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+									"pm.environment.set(\"middleName\", pm.variables.replaceIn('{{$randomFirstName}}'));",
+									"pm.environment.set(\"lastName\", pm.variables.replaceIn('{{$randomLastName}}'));",
+									"pm.environment.set(\"randomCodeEmployee\", pm.variables.replaceIn('{{$randomInt}}'));",
+									"const moment = require(\"moment\");",
+									"var birthdate = moment().add(\"days\", _.random(1,30));",
+									"var licenseNumber = moment().add(\"days\", _.random(1,30));",
+									"var licenseNumberExpDate = moment().add(\"days\", _.random(1,30));",
+									"pm.environment.set(\"dob\", birthdate.format(\"YYYY-MM-DD\"));",
+									"pm.environment.set(\"licenseNumber\", licenseNumber.format(\"YYYY-MM-DD\"));",
+									"pm.environment.set(\"licenseNumberExpDate\", licenseNumberExpDate.format(\"YYYY-MM-DD\"));",
+									"pm.environment.set(\"maritalStatus\", \"Married\");",
+									"pm.environment.set(\"gender\", \"F\");",
+									"pm.environment.set(\"otherId\", pm.variables.replaceIn('{{$randomInt}}'));",
+									"pm.environment.set(\"nationality\", \"Indonesian\");",
+									"const firstName = pm.variables.get(\"firstName\");",
+									"const middleName = pm.variables.get(\"middleName\");",
+									"const lastName = pm.variables.get(\"lastName\");",
+									"pm.environment.set(\"Name\", firstName.concat(\" \", middleName, \" \", lastName));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify Response\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Updated\");",
+									"",
+									"    pm.test(\"Response time is less than 200ms\", function () {",
+									"        pm.expect(pm.response.responseTime).to.be.below(800);",
+									"    });",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"id\":{{newemployeeid}},\n        \"firstName\": \"{{firstName}}\",\n        \"middleName\": \"{{middleName}}\",\n        \"lastName\": \"{{lastName}}\",\n        \"code\": \"{{randomCodeEmployee}}\",\n        \"dob\": \"{{dob}}\",\n        \"licenseNumber\": \"{{licenseNumber}}\",\n        \"licenseNumberExpDate\": \"{{licenseNumberExpDate}}\",\n        \"maritalStatus\": \"{{maritalStatus}}\",\n        \"gender\": \"{{gender}}\",\n        \"otherId\": \"{{otherId}}\",\n        \"nationality\": \"{{nationality}}\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Employee Search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Verify Responses\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].firstName).to.eql(pm.environment.get(\"firstName\"))",
+									"    pm.expect(jsonData.data[0].middleName).to.eql(pm.environment.get(\"middleName\"))",
+									"    pm.expect(jsonData.data[0].lastName).to.eql(pm.environment.get(\"lastName\"));",
+									"    pm.expect(jsonData.data[0].code).to.eql(pm.environment.get(\"randomCodeEmployee\"));",
+									"    pm.expect(jsonData.data[0].employeeId).to.eql(pm.environment.get(\"newemployeeid\"));",
+									"    pm.expect(jsonData.data[0].fullName).to.eql(pm.environment.get(\"Name\"));",
+									"    pm.expect(jsonData.data[0].status).to.eql(null);",
+									"    pm.expect(jsonData.data[0].dob).to.eql(pm.environment.get(\"dob\"));",
+									"    pm.expect(jsonData.data[0].driversLicenseNumber).to.eql(\"\");",
+									"    pm.expect(jsonData.data[0].licenseExpiryDate).to.eql(null);",
+									"    pm.expect(jsonData.data[0].maritalStatus).to.eql(null);",
+									"    pm.expect(jsonData.data[0].gender).to.eql(null);",
+									"    pm.expect(jsonData.data[0].otherId).to.eql(\"\");",
+									"    pm.expect(jsonData.data[0].nationality).to.eql(null);",
+									"    pm.expect(jsonData.data[0].unit).to.eql(null);",
+									"    pm.expect(jsonData.data[0].jobTitle).to.eql(null);",
+									"    pm.expect(jsonData.data[0].supervisor).to.eql(null);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/search?name={{Name}}&code={{randomCodeEmployee}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "{{Name}}"
+								},
+								{
+									"key": "code",
+									"value": "{{randomCodeEmployee}}"
+								},
+								{
+									"key": "status",
+									"value": "null",
+									"disabled": true
+								},
+								{
+									"key": "supervisor",
+									"value": "null",
+									"disabled": true
+								},
+								{
+									"key": "jobTitle",
+									"value": "null",
+									"disabled": true
+								},
+								{
+									"key": "unit",
+									"value": "null",
+									"disabled": true
+								},
+								{
+									"key": "dob",
+									"value": "{{dob}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Employee Contact Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const firstName = pm.variables.get(\"firstName\");",
+									"const middleName = pm.variables.get(\"middleName\");",
+									"const lastName = pm.variables.get(\"lastName\");",
+									"",
+									"pm.test(\"Verify Responses\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.id).to.eql(pm.variables.get(\"newemployeeid\"));",
+									"    pm.expect(jsonData.data.code).to.eql(pm.environment.get(\"randomCodeEmployee\"));",
+									"pm.sendRequest(\"https://postman-echo.com/get\", function (err, response) {",
+									"    console.log(response.json());",
+									"});",
+									"    pm.expect(jsonData.data.fullName).to.eql(firstName.concat(\" \", middleName, \" \", lastName));",
+									"    pm.expect(jsonData.data.addressStreet1).to.eql(\"\");",
+									"    pm.expect(jsonData.data.addressStreet2).to.eql(\"\");",
+									"    pm.expect(jsonData.data.city).to.eql(\"\");",
+									"    pm.expect(jsonData.data.state).to.eql(\"\");",
+									"    pm.expect(jsonData.data.zip).to.eql(null);",
+									"    pm.expect(jsonData.data.county).to.eql(\"\");",
+									"    pm.expect(jsonData.data.homeTelephone).to.eql(null);",
+									"    pm.expect(jsonData.data.workTelephone).to.eql(null);",
+									"    pm.expect(jsonData.data.mobile).to.eql(null);",
+									"    pm.expect(jsonData.data.workEmail).to.eql(null);",
+									"    pm.expect(jsonData.data.otherEmail).to.eql(null);",
+									"    });",
+									"   ",
+									"",
+									"",
+									"    ",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/contact-detail",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"contact-detail"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Save Employee Contact Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify Responses\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Saved\");",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"addressStreet1\", pm.variables.replaceIn('{{$randomStreetAddress}}'));",
+									"pm.environment.set(\"addressStreet2\", pm.variables.replaceIn('{{$randomStreetAddress}}'));",
+									"pm.environment.set(\"city\", pm.variables.replaceIn('{{$randomCity}}'));",
+									"pm.environment.set(\"state\", pm.variables.replaceIn('{{$randomCity}}'));",
+									"pm.environment.set(\"zip\", 15115);",
+									"pm.environment.set(\"country\", \"Indonesia\");",
+									"pm.environment.set(\"randomhomeTelephone\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));",
+									"pm.environment.set(\"randomworkTelephone\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));",
+									"pm.environment.set(\"randommobile\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));",
+									"pm.environment.set(\"randomWorkEmail\", pm.variables.replaceIn('{{$randomEmail}}'));",
+									"pm.environment.set(\"randomOtherEmail\", pm.variables.replaceIn('{{$randomEmail}}'));",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"id\": \"{{NewEmployeeId}}\",\n        \"addressStreet1\": \"{{addressStreet1}}\",\n        \"addressStreet2\": \"{{addressStreet2}}\",\n        \"city\": \"{{city}}\",\n        \"state\": \"{{state}}\",\n        \"zip\": \"{{zip}}\",\n        \"country\": \"{{country}}\",\n        \"homeTelephone\": \"{{randomhomeTelephone}}\",\n        \"workTelephone\": \"{{randomworkTelephone}}\",\n        \"mobile\": \"{{randommobile}}\",\n        \"workEmail\": \"{{randomWorkEmail}}\",\n        \"otherEmail\": \"{{randomOtherEmail}}\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/contact-detail",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"contact-detail"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Update Employee Contact Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify response\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Updated\");",
+									"",
+									"    pm.test(\"Response time is less than 200ms\", function () {",
+									"        pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"addressStreet1\", pm.variables.replaceIn('{{$randomStreetAddress}}'));",
+									"pm.environment.set(\"addressStreet2\", pm.variables.replaceIn('{{$randomStreetAddress}}'));",
+									"pm.environment.set(\"city\", pm.variables.replaceIn('{{$randomCity}}'));",
+									"pm.environment.set(\"state\", pm.variables.replaceIn('{{$randomCity}}'));",
+									"pm.environment.set(\"zip\", 15115);",
+									"pm.environment.set(\"country\", \"Indonesia\");",
+									"pm.environment.set(\"randomhomeTelephone\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));",
+									"pm.environment.set(\"randomworkTelephone\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));",
+									"pm.environment.set(\"randommobile\", pm.variables.replaceIn('{{$randomPhoneNumber}}'));",
+									"pm.environment.set(\"randomWorkEmail\", pm.variables.replaceIn('{{$randomEmail}}'));",
+									"pm.environment.set(\"randomOtherEmail\", pm.variables.replaceIn('{{$randomEmail}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"id\": \"{{NewEmployeeId}}\",\n        \"addressStreet1\": \"{{addressStreet1}}\",\n        \"addressStreet2\": \"{{addressStreet2}}\",\n        \"city\": \"{{city}}\",\n        \"state\": \"{{state}}\",\n        \"zip\": \"{{zip}}\",\n        \"country\": \"{{country}}\",\n        \"homeTelephone\": \"{{randomhomeTelephone}}\",\n        \"workTelephone\": \"{{randomworkTelephone}}\",\n        \"mobile\": \"{{randommobile}}\",\n        \"workEmail\": \"{{randomWorkEmail}}\",\n        \"otherEmail\": \"{{randomOtherEmail}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/contact-detail",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"contact-detail"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Save Employeee Dependent",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"nameDependent\", pm.variables.replaceIn('{{$randomFullName}}'));",
+									"pm.environment.set(\"relationship\", \"Child\");",
+									"",
+									"const moment = require(\"moment\");",
+									"var dob = moment().add(\"days\", _.random(1,30));",
+									"pm.environment.set(\"dobDependent\", dob.format(\"YYYY-MM-DD\"));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Verify Responses\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Saved\");",
+									"    pm.environment.set(\"sequenceNumber\", jsonData.sequenceNumber);",
+									"    ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":\"{{newemployeeid}}\",\n    \"name\":\"{{nameDependent}}\",\n    \"relationship\":\"{{relationship}}\",\n    \"dob\":\"{{dobDependent}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/dependent",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"dependent"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. Employee Dependents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Verify Response\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].name).to.eql(pm.environment.get(\"nameDependent\"));",
+									"    pm.expect(jsonData.data[0].relationship).to.eql(pm.environment.get(\"relationship\"));",
+									"    pm.expect(jsonData.data[0].dob).to.eql(pm.environment.get(\"dobDependent\"));",
+									"    pm.expect(jsonData.data[0].sequenceNumber).to.eql(pm.environment.replaceIn(\"{{sequenceNumber}}\"));",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/dependent",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"dependent"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. Delete Employee Dependents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify Responses\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Deleted\");",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sequenceNumber\":\"{{sequenceNumber}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/dependent",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"dependent"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. Terminate Employment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Verify Responses\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(\"Successfully Terminated\");",
+									"    ",
+									"    pm.test(\"Response time is less than 200ms\", function () {",
+									"        pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"dateTerminate\", \"2021-09-24\");",
+									"pm.environment.set(\"reason\", \"Contract Not Renewed\");",
+									"pm.environment.set(\"note\", \"Contract End\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":   \"{{newemployeeid}}\",\n    \"date\": \"{{dateTerminate}}\",\n    \"reason\":\"{{reason}}\",\n    \"note\": \"{{note}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/employee/:id/action/terminate",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								":id",
+								"action",
+								"terminate"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{newemployeeid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
